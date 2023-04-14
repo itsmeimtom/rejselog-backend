@@ -4,14 +4,17 @@
 
 	header("Content-Type: application/json");
 
-	if($_GET["data"] == "") {
+	$post = file_get_contents("php://input");
+	// die(var_dump($post));
+
+	if($post == "") {
 		header("HTTP/1.0 400 Bad Request");
 		die('{"message": "no data provided", "error": true}');
 	}
 
 	// check if data is base64 formatted
 	// this doesn't really work, but it's good enough
-	if(!base64_decode($_GET["data"], true)) {
+	if(!base64_decode($post, true)) {
 		header("HTTP/1.0 400 Bad Request");
 		die('{"message": "data is not base64 encoded", "error": true}');
 	}
@@ -28,12 +31,12 @@
 	if($result->fetchArray()) {
 		// update
 		$new = false;
-		$r = $db->exec('UPDATE saves SET data = "' . $_GET["data"] . '" WHERE user = "' . $user . '"');
+		$r = $db->exec('UPDATE saves SET data = "' . $post . '" WHERE user = "' . $user . '"');
 	} else {
 		// insert
 		header("HTTP/1.0 201 Created");
 		$new = true;
-		$r = $db->exec('INSERT INTO saves (user, data) VALUES ("' . $user . '", "' . $_GET["data"] . '")');
+		$r = $db->exec('INSERT INTO saves (user, data) VALUES ("' . $user . '", "' . $post . '")');
 	}
 
 	// close the file
