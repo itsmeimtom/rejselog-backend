@@ -7,7 +7,8 @@
 		die("401: Auth Problem");
 		exit;
 	} else {
-		if($_SERVER['PHP_AUTH_USER'] == "test" && $_SERVER['PHP_AUTH_PW'] == "123") {
+		// todo: user and pass db
+		if($_SERVER['PHP_AUTH_USER'] === "test" && $_SERVER['PHP_AUTH_PW'] === "123") {
 			// all good!
 
 			$user = $_SERVER['PHP_AUTH_USER'];
