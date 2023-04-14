@@ -19,9 +19,6 @@
 		die('{"message": "data is not base64 encoded", "error": true}');
 	}
 
-	// open the file
-	$db = new SQLite3("_data.sqlite");
-
 	// if user exists
 	$result = $db->query('SELECT * FROM saves WHERE user = "' . $user . '"');
 

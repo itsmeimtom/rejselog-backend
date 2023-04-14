@@ -4,9 +4,6 @@
 
 	header("Content-Type: application/json");
 
-	// open the file
-	$db = new SQLite3("_data.sqlite");
-
 	// fetch from db
 	$result = $db->query('SELECT "data" FROM saves WHERE user = "' . $user . '" LIMIT 1');
 	$data = $result->fetchArray();
