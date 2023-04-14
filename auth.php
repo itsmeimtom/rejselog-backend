@@ -4,21 +4,45 @@
 	if (!isset($_SERVER['PHP_AUTH_USER'])) {
 		header('WWW-Authenticate: Basic realm="Rejselog"');
 		header("HTTP/1.0 401 Unauthorized");
-		die("401: Auth Problem");
-		exit;
+		authError();
 	} else {
-		// todo: user and pass db
-		if($_SERVER['PHP_AUTH_USER'] === "test" && $_SERVER['PHP_AUTH_PW'] === "123") {
-			// all good!
+		$user = $_SERVER['PHP_AUTH_USER'];
+		
+		// strip to only be alphanumeric (thanks copilot)
+		$user = preg_replace("/[^a-zA-Z0-9]+/", "", $user);
+		
 
-			$user = $_SERVER['PHP_AUTH_USER'];
-			
-			// strip to only be alphanumeric (thanks copilot)
-			$user = preg_replace("/[^a-zA-Z0-9]+/", "", $user);
-		} else {
+		// check if user exists
+		$userResult = $db->query('SELECT user,pass FROM saves WHERE user = "' . $user . '" LIMIT 1');
+		$userData = $userResult->fetchArray();
+
+		if(!$userData) {
+			authError();
+			die(); // just in case
+		}
+
+		if($userData[0] !== $user) {
+			authError();
+			die(); // just in case
+		}
+
+		// check if password is correct
+
+		$dbPass = $userData[1];
+
+
+		// who knows how secure this is but it works so whatever
+		if(!password_verify($_SERVER['PHP_AUTH_PW'], $dbPass)) {
+			authError();
+			die(); // just in case
+		}
+
+		// if we've gotten this far, we're good to go
+	}
+	
+	function authError() {
 			header('WWW-Authenticate: Basic realm="Rejselog"');
 			header("HTTP/1.0 401 Unauthorized");
 			die("401: Auth Problem");
-		}
 	}
 ?>

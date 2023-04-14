@@ -1,6 +1,6 @@
 <?php
-	require "auth.php";
 	require "db.php";
+	require "auth.php";
 
 	header("Content-Type: application/json");
 
