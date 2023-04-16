@@ -13,14 +13,84 @@
 	require "db.php";
 	require "auth.php";
 
-	$journeyData = $_POST["data"];
+	
 	$RMcookie = $_POST["cookie"];
 
 	header("Content-Type: application/json");
 	
-	if(!$journeyData || !$RMcookie) {
-		die('{error: "Missing data"}');
+	if(!$RMcookie) {
+		die('{error: "Missing cookie"}');
 	}
+
+
+	// check POST data
+
+	// if missing origin or destination name
+	if(!$_POST["origin_name"] || !$_POST["destination_name"]) {
+		die('{error: "Missing origin or destination name"}');
+	}
+
+	// if origin and destination are too long
+	if(strlen($_POST["origin_name"]) > 255 || strlen($_POST["destination_name"]) > 255) {
+		die('{error: "Origin or destination name too long (255 max)"}');
+	}
+
+	// if platforms are set
+	if($_POST["origin_platform"] || $_POST["destination_platform"]) {
+		// if platforms are too long
+		if(strlen($_POST["origin_platform"]) > 5 || strlen($_POST["destination_platform"]) > 5) {
+			die('{error: "Origin or destination platform too long (5 max)"}');
+		}
+	}
+
+	// if missing actual dates/times
+	if(!$_POST["act_dep_date"] || !$_POST["act_dep_time"] || !$_POST["act_arr_date"] || !$_POST["act_arr_time"]) {
+		die('{error: "Missing actual dates/times"}');
+	}
+
+	// if route description is too long
+	if(strlen($_POST["route_description"]) > 512) {
+		die('{error: "Route description too long (512 max)"}');
+	}
+
+	// if operator name set
+	if($_POST["operator_name"]) {
+		// if operator name is too long
+		if(strlen($_POST["operator_name"]) > 36) {
+			die('{error: "Operator name too long (36 max)"}');
+		}
+	}
+
+	// if operator code set
+	if($_POST["operator_code"]) {
+		// if operator code is too long
+		if(strlen($_POST["operator_code"]) > 4) {
+			die('{error: "Operator code too long (4 max)"}');
+		}
+	}
+
+	// if identity set
+	if($_POST["identity"]) {
+		// if identity is too long
+		if(strlen($_POST["identity"]) > 8) {
+			die('{error: "Identity too long (8 max)"}');
+		}
+	}
+
+	// if vehicle type not 0, 1, 2, or 3
+	// (0 = train, 1 = bus, 2 = ferry, 3 = tram/metro)
+	if($_POST["vehicle_type"] != 0 && $_POST["vehicle_type"] != 1 && $_POST["vehicle_type"] != 2 && $_POST["vehicle_type"] != 3) {
+		die('{error: "Vehicle type must be 0, 1, 2, or 3"}');
+	}
+
+	// if notes set
+	if($_POST["notes"]) {
+		// if notes are too long
+		if(strlen($_POST["notes"]) > 512) {
+			die('{error: "Notes too long (512 max)"}');
+		}
+	}
+
 
 	$ua = "Rejselog (PHP " . phpversion() . " cURL) (http://TomR.me)";
 
@@ -80,45 +150,41 @@
 
     $fields = array(
 		"csrfmiddlewaretoken" => "$csrfToken",
-		"origin_name" => "test origin",
+		"origin_name" => $_POST["origin_name"] ? $_POST["origin_name"] : "Unset Origin",
 		"origin" => "",
-		"origin_platform" => "1",
-		"act_dep_date" => "16/04/2023",
-		"act_dep_time" => "00:00",
-		"destination_name" => "test destination",
+		"origin_platform" => $_POST["origin_platform"] ? $_POST["origin_platform"] : "",
+		"act_dep_date" => $_POST["act_dep_date"] ? $_POST["act_dep_date"] : "01/01/1970",
+		"act_dep_time" => $_POST["act_dep_time"] ? $_POST["act_dep_time"] : "00:00",
+		"destination_name" => $_POST["destination_name"] ? $_POST["destination_name"] : "Unset Destination",
 		"destination" => "",
-		"destination_platform" => "5",
-		"act_arr_date" => "16/04/2023",
-		"act_arr_time" => "00:01",
-		"route_description" => "test route",
-		"distance_miles" => "42",
-		"distance_chains" => "2",
-		"operator_name" => "test TOC",
-		"operator_code" => "CODE",
-		"identity" => "identity",
-		"vehicle_type" => "0",
-		"ids-TOTAL_FORMS" => "4",
+		"destination_platform" => $_POST["destination_platform"] ? $_POST["destination_platform"] : "",
+		"act_arr_date" => $_POST["act_arr_date"] ? $_POST["act_arr_date"] : "01/01/1970",
+		"act_arr_time" => $_POST["act_arr_time"] ? $_POST["act_arr_time"] : "00:01",
+		"route_description" => $_POST["route_description"] ? $_POST["route_description"] : "",
+		"distance_miles" => $_POST["distance_miles"] ? $_POST["distance_miles"] : "",
+		"distance_chains" => $_POST["distance_chains"] ? $_POST["distance_chains"] : "",
+		"operator_name" => $_POST["operator_name"] ? $_POST["operator_name"] : "",
+		"operator_code" => $_POST["operator_code"] ? $_POST["operator_code"] : "",
+		"identity" => $_POST["identity"] ? $_POST["identity"] : "",
+		"vehicle_type" => $_POST["vehicle_type"] ? $_POST["vehicle_type"] : "",
+		"ids-TOTAL_FORMS" => $_POST["ids-TOTAL_FORMS"] ? $_POST["ids-TOTAL_FORMS"] : "2",
 		"ids-INITIAL_FORMS" => "0",
 		"ids-MIN_NUM_FORMS" => "2",
 		"ids-MAX_NUM_FORMS" => "1000",
-		"ids-0-identity" => "123",
-		"ids-1-identity" => "456",
-		"ids-2-identity" => "789",
-		"ids-3-identity" => "999",
-		"plan_dep_date" => "16/04/2023",
-		"plan_dep_time" => "00:00",
-		"origin_tz" => "Europe/London",
-		"plan_arr_date" => "16/04/2023",
-		"plan_arr_time" => "00:01",
-		"destination_tz" => "Europe/London",
+		"ids-0-identity" => $_POST["ids-0-identity"] ? $_POST["ids-0-identity"] : "",
+		"ids-1-identity" => $_POST["ids-1-identity"] ? $_POST["ids-1-identity"] : "",
+		"plan_dep_date" => $_POST["plan_dep_date"] ? $_POST["plan_dep_date"] : "",
+		"plan_dep_time" => $_POST["plan_dep_time"] ? $_POST["plan_dep_time"] : "",
+		"origin_tz" => $_POST["origin_tz"] ? $_POST["origin_tz"] : "Europe/Copenhagen",
+		"plan_arr_date" => $_POST["plan_arr_date"] ? $_POST["plan_arr_date"] : "",
+		"plan_arr_time" => $_POST["plan_arr_time"] ? $_POST["plan_arr_time"] : "",
+		"destination_tz" => $_POST["destination_tz"] ? $_POST["destination_tz"] : "Europe/Copenhagen",
 		"hidden" => "10",
-		"notes" => "TESTING"
+		"notes" => $_POST["notes"] ? $_POST["notes"] : "This journey was added by go.TomR.me/rejselog. No notes were set.",
     );
 
     // build the urlencoded data
     $postvars = http_build_query($fields);
-
-	// die(var_dum	p($postvars));
 
     curl_setopt($curlAddJourney, CURLOPT_URL, "https://my.railmiles.me/journeys/rail/new");
 	curl_setopt($curlAddJourney, CURLOPT_POST, 1);
