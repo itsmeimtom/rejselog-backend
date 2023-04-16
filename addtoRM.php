@@ -22,7 +22,7 @@
 		die('{error: "Missing data"}');
 	}
 
-	$ua = "RejselogTest/0.0 (rj@TomR.me)";
+	$ua = "Rejselog (PHP " . phpversion() . " cURL) (http://TomR.me)";
 
 	// fetch CSRF token from RM form
 	$curlCSRF = curl_init();
@@ -115,7 +115,6 @@
 		"notes" => "TESTING"
     );
 
-    
     // build the urlencoded data
     $postvars = http_build_query($fields);
 
