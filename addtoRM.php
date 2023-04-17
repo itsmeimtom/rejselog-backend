@@ -156,8 +156,6 @@
 
 	$curlAddJourney = curl_init();
 
-	
-
     $fields = array(
 		"csrfmiddlewaretoken" => "$csrfToken",
 		"origin_name" => $_POST["origin_name"] ? $_POST["origin_name"] : "Unset Origin",
@@ -242,14 +240,14 @@
     // execute post
     $result = curl_exec($curlAddJourney);
 	
-	// var_dump($result);
-
-	// if result contains 
+	// if result contains "sorry"
 	if(strpos($result, "Sorry") !== false) {
-		// hopefully added
-		echo '{"success":true}';
-	} else {
-		echo '{"error":"RailMiles responded but it looks like there is an error with some of the data!"}';
+		die('{"error":"Sorry, something went wrong. Please try again."}');
+	}
+
+	// if result contains "added"
+	if(strpos($result, "successfully added") !== false) {
+		die('{"success":"Journey added!"}');
 	}
 
 	// close connection
