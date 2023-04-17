@@ -250,6 +250,8 @@
 		die('{"success":"Journey added!"}');
 	}
 
+	die('{"success":"Maybe!"}');
+
 	// close connection
     curl_close($curlAddJourney);
 
