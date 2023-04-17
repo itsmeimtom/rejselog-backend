@@ -1,5 +1,13 @@
 <?php
-	header("Access-Control-Allow-Origin: *");
+
+
+	// development
+	if($_SERVER['REMOTE_ADDR'] == "127.0.0.1" || $_SERVER['REMOTE_ADDR'] == "::1") {
+		// if we're on localhost, allow all origins
+		header("Access-Control-Allow-Origin: *");
+	} else {
+		header("Access-Control-Allow-Origin: https://github-pages.thomasr.me");
+	}
 
 	if (!isset($_SERVER['PHP_AUTH_USER'])) {
 		header('WWW-Authenticate: Basic realm="Rejselog"');
