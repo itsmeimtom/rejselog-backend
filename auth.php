@@ -9,6 +9,9 @@
 		header("Access-Control-Allow-Origin: https://github-pages.thomasr.me");
 	}
 
+	// allow credentials
+	header("Access-Control-Allow-Credentials: true");
+
 	if (!isset($_SERVER['PHP_AUTH_USER'])) {
 		header('WWW-Authenticate: Basic realm="Rejselog"');
 		header("HTTP/1.0 401 Unauthorized");
